@@ -79,15 +79,11 @@ FVector AToonTanksGameMode::CalculateSpawnArea(AActor* OriginActor, float MinDis
 	float OffsetX = RandomDistance * FMath::Cos(RandomAngle);
 	float OffsetY =  RandomDistance * FMath::Sin(RandomAngle);
 
-	// Manually sets the map bounds
-	FVector2d MinMapBoundary = FVector2d(-2350.f, -2350.f);
-	FVector2d MaxMapBoundary = FVector2d(2350.f, 2350.f);
-
 	// Adds all the random variables together to get a random location within a radius and returns it 
 	RandomLocation = OriginActor->GetActorLocation() + FVector(OffsetX, OffsetY, 0);
 
 	/* If this is correct, should check if any parts of the spawn location are greater than the boundary I have set, if so it will clamp it to the boundary max
-	   and place it back into the level albeit at the edge rather then random*/
+	   and place it back into the level albeit at the edge rather then random */
 	if (RandomLocation.X < MinMapBoundary.X || RandomLocation.X > MaxMapBoundary.X || RandomLocation.Y < MinMapBoundary.Y || RandomLocation.Y > MaxMapBoundary.Y)
 	{
 		RandomLocation.X = FMath::Clamp(RandomLocation.X, MinMapBoundary.X, MaxMapBoundary.X);
@@ -107,6 +103,12 @@ void AToonTanksGameMode::SpawnTurret()
 	{
 		GetWorld()->SpawnActor<ATower>(TowerClass, SpawnLocation, FRotator::ZeroRotator);
 		CurrentTowers++;
+
+		if (DebugSpheres == true)
+		{
+			DrawDebugSphere(GetWorld(), Tank->GetActorLocation(), MinRadius, 20, FColor::Red, false, 2.f);
+			DrawDebugSphere(GetWorld(), Tank->GetActorLocation(), MaxRadius, 20, FColor::Green, false, 2.f);
+		}
 	}
 	UE_LOG(LogTemp, Display, TEXT("Turrets: %i"), CurrentTowers);
 }
@@ -119,6 +121,3 @@ int32 AToonTanksGameMode::GetTargetTowerCount() const
 
 	return TowerArray.Num();
 }
-
-
-
