@@ -12,6 +12,8 @@ void AToonTanksGameMode::BeginPlay()
 	Super::BeginPlay();
 
 	HandleGameStart();
+
+	SpawnTurret();
 }
 
 void AToonTanksGameMode::ActorDied(AActor* DeadActor)
@@ -22,23 +24,25 @@ void AToonTanksGameMode::ActorDied(AActor* DeadActor)
 		if (ToonTanksPlayerController)
 		{
 			ToonTanksPlayerController->SetPlayerEnabledState(false);
+			GetWorldTimerManager().ClearTimer(SpawnTimerHandle);
 		}
 		GameOver(false);
 	}
 	else if (ATower* DestroyedTower = Cast<ATower>(DeadActor))
 	{
 		DestroyedTower->HandleDestruction();
-		TargetTowers --;
-		if(TargetTowers == 0)
+		CurrentTowers --;
+		if(CurrentTowers == 0)
 		{
-			GameOver(true);
+			SpawnTurret();
+			//GameOver(true);
 		}
 	}
 }
 
 void AToonTanksGameMode::HandleGameStart()
 {
-	TargetTowers = GetTargetTowerCount();
+	CurrentTowers = GetTargetTowerCount();
 	
 	// Gets references to the tank and controller by casting
 	Tank = Cast<ATank>(UGameplayStatics::GetPlayerPawn(this, 0));
@@ -55,11 +59,50 @@ void AToonTanksGameMode::HandleGameStart()
 		FTimerHandle PlayerEnableTimerHandle;
 		FTimerDelegate PlayerEnableTimerDelegate = FTimerDelegate::CreateUObject(ToonTanksPlayerController, &AToonTanksPlayerController::SetPlayerEnabledState, true);
 		GetWorldTimerManager().SetTimer(PlayerEnableTimerHandle, PlayerEnableTimerDelegate, StartDelay, false);
-		
+	}
+
+	if(TowerSpawnTimerActivate == true)
+	{
+		// Creates a timer to start spawning the towers
+		GetWorldTimerManager().SetTimer(SpawnTimerHandle, this, &AToonTanksGameMode::SpawnTurret, TowerSpawnTimer, true);
 	}
 }
 
-int32 AToonTanksGameMode::GetTargetTowerCount()
+FVector AToonTanksGameMode::CalculateSpawnArea(AActor* OriginActor, float MinDistance, float MaxDistance)
+{
+	float RandomAngle = FMath::RandRange(0.f, 2.0f * PI);
+	float RandomDistance = FMath::RandRange(MinDistance, MaxDistance);
+        
+	float OffsetX = RandomDistance * FMath::Cos(RandomAngle);
+	float OffsetY =  RandomDistance * FMath::Sin(RandomAngle);
+	RandomLocation = OriginActor->GetActorLocation() + FVector(OffsetX, OffsetY, 0);
+
+	return RandomLocation;
+}
+
+void AToonTanksGameMode::SpawnTurret()
+{
+	FVector SpawnLocation = CalculateSpawnArea(Tank, MinRadius, MaxRadius);
+		
+	// Checks if the bool has been set to false
+	if (TowerSpawnTimerActivate == false)
+	{
+		GetWorldTimerManager().ClearTimer(SpawnTimerHandle);
+	}
+
+	// Checks the tower is not a null and spawns.
+	if (TowerClass != nullptr && CurrentTowers < MaxTowers)
+	{
+		if(TowerSpawnTimerActivate == true)
+		{
+			GetWorld()->SpawnActor<ATower>(TowerClass, SpawnLocation, FRotator::ZeroRotator);
+			CurrentTowers++;
+		}
+	}
+	UE_LOG(LogTemp, Display, TEXT("Turrets: %i"), CurrentTowers);
+}
+
+int32 AToonTanksGameMode::GetTargetTowerCount() const
 {
 	TArray<AActor*> TowerArray;
 	
@@ -67,5 +110,6 @@ int32 AToonTanksGameMode::GetTargetTowerCount()
 
 	return TowerArray.Num();
 }
+
 
 
