@@ -14,6 +14,8 @@ void AToonTanksGameMode::BeginPlay()
 	HandleGameStart();
 
 	SpawnTurret();
+
+	DrawDebugSphere(GetWorld(), Tank->GetActorLocation(), 750.f, 20, FColor::Red, true);
 }
 
 void AToonTanksGameMode::ActorDied(AActor* DeadActor)
@@ -32,6 +34,7 @@ void AToonTanksGameMode::ActorDied(AActor* DeadActor)
 	{
 		DestroyedTower->HandleDestruction();
 		CurrentTowers --;
+		UE_LOG(LogTemp, Display, TEXT("Turrets: %i"), CurrentTowers);
 		if(CurrentTowers == 0)
 		{
 			SpawnTurret();
@@ -83,21 +86,12 @@ FVector AToonTanksGameMode::CalculateSpawnArea(AActor* OriginActor, float MinDis
 void AToonTanksGameMode::SpawnTurret()
 {
 	FVector SpawnLocation = CalculateSpawnArea(Tank, MinRadius, MaxRadius);
-		
-	// Checks if the bool has been set to false
-	if (TowerSpawnTimerActivate == false)
-	{
-		GetWorldTimerManager().ClearTimer(SpawnTimerHandle);
-	}
-
+	
 	// Checks the tower is not a null and spawns.
-	if (TowerClass != nullptr && CurrentTowers < MaxTowers)
+	if (TowerClass != nullptr && CurrentTowers < MaxTowers && TowerSpawnTimerActivate == true)
 	{
-		if(TowerSpawnTimerActivate == true)
-		{
-			GetWorld()->SpawnActor<ATower>(TowerClass, SpawnLocation, FRotator::ZeroRotator);
-			CurrentTowers++;
-		}
+		GetWorld()->SpawnActor<ATower>(TowerClass, SpawnLocation, FRotator::ZeroRotator);
+		CurrentTowers++;
 	}
 	UE_LOG(LogTemp, Display, TEXT("Turrets: %i"), CurrentTowers);
 }

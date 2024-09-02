@@ -27,7 +27,7 @@ public:
 	bool TowerSpawnTimerActivate = true;
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Tower Spawn")
-	float MinRadius = 500.f;
+	float MinRadius = 750.f;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Tower Spawn")
 	float MaxRadius = 2000.f;
 	FVector RandomLocation;
