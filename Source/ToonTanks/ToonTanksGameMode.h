@@ -15,9 +15,10 @@ class TOONTANKS_API AToonTanksGameMode : public AGameModeBase
 	GENERATED_BODY()
 
 public:
-	
+
 	void ActorDied(AActor* DeadActor);
 
+#pragma region Tower Spawn
 	// Tower Spawn variables and functions
 	UPROPERTY(EditAnywhere, Category = "Tower Spawn")
 	TSubclassOf<class ATower> TowerClass;
@@ -54,6 +55,7 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void SpawnTurret();
 	FVector CalculateSpawnArea(AActor* Origin, float MinDistance, float MaxDistance);
+#pragma endregion
 
 protected:
 	virtual void BeginPlay() override;
