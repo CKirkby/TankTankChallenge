@@ -22,6 +22,10 @@ public:
 	// Called every frame
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
+	bool IsInvunerable = false;
+
+	void SetInvunerable();
+
 private:
 	UPROPERTY(EditAnywhere)
 	float MaxHeath = 100.f;
@@ -32,5 +36,10 @@ private:
 	// Creates a function ready to access the damage taken 
 	UFUNCTION()
 	void DamageTaken(AActor* DamagedActor, float Damage, const UDamageType* DamageType, class AController* Instigator, AActor* DamageCauser);
-		
+
+	FTimerHandle InvunTimerHandle;
+	UPROPERTY(EditAnywhere)
+	float InvunTime = 5.f;
+
+	void EndInvun();
 };
