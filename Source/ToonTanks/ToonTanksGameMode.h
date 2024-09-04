@@ -18,6 +18,15 @@ public:
 
 	void ActorDied(AActor* DeadActor);
 
+protected:
+	virtual void BeginPlay() override;
+
+	UFUNCTION(BlueprintImplementableEvent)
+	void StartGame();
+
+	UFUNCTION(BlueprintImplementableEvent)
+	void GameOver(bool bWonGame);
+
 #pragma region Tower Spawn
 	// Tower Spawn variables and functions
 	UPROPERTY(EditAnywhere, Category = "Tower Spawn")
@@ -56,15 +65,6 @@ public:
 	void SpawnTurret();
 	FVector CalculateSpawnArea(AActor* Origin, float MinDistance, float MaxDistance);
 #pragma endregion
-
-protected:
-	virtual void BeginPlay() override;
-
-	UFUNCTION(BlueprintImplementableEvent)
-	void StartGame();
-
-	UFUNCTION(BlueprintImplementableEvent)
-	void GameOver(bool bWonGame);
 	
 private:
 	class ATank* Tank;

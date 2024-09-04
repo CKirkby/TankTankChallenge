@@ -33,7 +33,6 @@ void UHealthComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActo
 
 void UHealthComponent::DamageTaken(AActor* DamagedActor, float Damage, const UDamageType* DamageType, AController* Instigator, AActor* DamageCauser)
 {
-	UE_LOG(LogTemp, Error, TEXT("Health Remaining: %f"), Health);
 	if (Damage <= 0.f) return;
 
 	if (IsInvunerable == false)
@@ -52,13 +51,11 @@ void UHealthComponent::SetInvunerable()
 	IsInvunerable = true;
 
 	GetWorld()->GetTimerManager().SetTimer(InvunTimerHandle, this, &UHealthComponent::EndInvun, InvunTime, false);
-	
 }
 
 void UHealthComponent::EndInvun()
 {
 	IsInvunerable = false;
-	UE_LOG(LogTemp, Display, TEXT("End Invunerable"));
 }
 
 

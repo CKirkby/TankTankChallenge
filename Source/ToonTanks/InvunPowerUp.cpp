@@ -46,6 +46,7 @@ void AInvunPowerUp::OverlapEvent(UPrimitiveComponent* OverlappedComp, AActor* Ot
 	if (OtherActor && OtherActor != this)
 	{
 		PlayerHealthComp->SetInvunerable();
+		UGameplayStatics::PlaySoundAtLocation(this, PowerUpSound, GetActorLocation());
 		UE_LOG(LogTemp, Display, TEXT("Pickup Picked Up"));
 		Destroy();
 	}
