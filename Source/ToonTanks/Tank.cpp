@@ -6,6 +6,7 @@
 #include "GameFramework/SpringArmComponent.h"
 #include "Kismet/GameplayStatics.h"
 #include "DrawDebugHelpers.h"
+#include "Components/SphereComponent.h"
 
 // Constructor
 ATank::ATank()
@@ -18,6 +19,9 @@ ATank::ATank()
 
 	Camera = CreateDefaultSubobject<UCameraComponent>(TEXT("Camera"));
 	Camera->SetupAttachment(SpringArm);
+
+	ShieldSphere = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Shield Sphere"));
+	ShieldSphere->SetupAttachment(RootComponent);
 }
 
 void ATank::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
@@ -36,6 +40,8 @@ void ATank::BeginPlay()
 	Super::BeginPlay();
 
 	TankPlayerController = Cast<APlayerController>(GetController());
+	
+	DisableShields();
 }
 
 // Called every frame
@@ -77,3 +83,23 @@ void ATank::Turn(float TurnValue)
 	DeltaRotation.Yaw = TurnValue * TurnSpeed * UGameplayStatics::GetWorldDeltaSeconds(this);
 	AddActorLocalRotation(DeltaRotation, true);
 }
+
+void ATank::EnableShields() const
+{
+	if(ShieldSphere)
+	{
+		ShieldSphere->SetVisibility(true);
+		UE_LOG(LogTemp, Display, TEXT("Deavtivated Shields"));
+	}
+}
+
+void ATank::DisableShields() const
+{
+	if(ShieldSphere)
+	{
+		ShieldSphere->SetVisibility(false);
+		UE_LOG(LogTemp, Display, TEXT("Activated Shields"));
+	}
+}
+
+

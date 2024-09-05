@@ -4,6 +4,7 @@
 #include "HealthComponent.h"
 #include "ToonTanksGameMode.h"
 #include "Kismet/GameplayStatics.h"
+#include "Tank.h"
 
 // Sets default values for this component's properties
 UHealthComponent::UHealthComponent()
@@ -22,6 +23,7 @@ void UHealthComponent::BeginPlay()
 	GetOwner()->OnTakeAnyDamage.AddDynamic(this, &UHealthComponent::DamageTaken);
 
 	ToonTanksGameMode = Cast<AToonTanksGameMode>(UGameplayStatics::GetGameMode(this));
+	Tank = Cast<ATank>(UGameplayStatics::GetPlayerPawn(this, 0));
 	
 }
 
@@ -51,11 +53,15 @@ void UHealthComponent::SetInvunerable()
 	IsInvunerable = true;
 
 	GetWorld()->GetTimerManager().SetTimer(InvunTimerHandle, this, &UHealthComponent::EndInvun, InvunTime, false);
+
+	Tank->EnableShields();
 }
 
 void UHealthComponent::EndInvun()
 {
 	IsInvunerable = false;
+	Tank->DisableShields();
 }
+
 
 

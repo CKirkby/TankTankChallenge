@@ -23,10 +23,16 @@ public:
 	APlayerController* GetTankPlayerController() const {return TankPlayerController;}
 
 	bool bAlive = true;
+	
+	void EnableShields() const;
+	void DisableShields() const;
 
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
+
+	UPROPERTY(EditAnywhere, Category = "Shield")
+	UStaticMeshComponent* ShieldSphere;
 
 public:	
 	// Called every frame
