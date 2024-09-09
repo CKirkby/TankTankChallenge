@@ -5,6 +5,7 @@
 #include "Tank.h"
 #include "ToonTanksPlayerController.h"
 #include "Tower.h"
+#include "InvunPowerUp.h"
 #include "kismet/GameplayStatics.h"
 
 void AToonTanksGameMode::BeginPlay()
@@ -14,6 +15,8 @@ void AToonTanksGameMode::BeginPlay()
 	HandleGameStart();
 
 	SpawnTurret();
+
+	SpawnPowerup();
 }
 
 void AToonTanksGameMode::ActorDied(AActor* DeadActor)
@@ -24,7 +27,7 @@ void AToonTanksGameMode::ActorDied(AActor* DeadActor)
 		if (ToonTanksPlayerController)
 		{
 			ToonTanksPlayerController->SetPlayerEnabledState(false);
-			GetWorldTimerManager().ClearTimer(SpawnTimerHandle);
+			GetWorldTimerManager().ClearTimer(SpawnTowerTimerHandle);
 		}
 		GameOver(false);
 	}
@@ -32,7 +35,6 @@ void AToonTanksGameMode::ActorDied(AActor* DeadActor)
 	{
 		DestroyedTower->HandleDestruction();
 		CurrentTowers --;
-		UE_LOG(LogTemp, Display, TEXT("Turrets: %i"), CurrentTowers);
 		if(CurrentTowers == 0)
 		{
 			SpawnTurret();
@@ -65,7 +67,13 @@ void AToonTanksGameMode::HandleGameStart()
 	if(TowerSpawnTimerActivate == true)
 	{
 		// Creates a timer to start spawning the towers
-		GetWorldTimerManager().SetTimer(SpawnTimerHandle, this, &AToonTanksGameMode::SpawnTurret, TowerSpawnTimer, true);
+		GetWorldTimerManager().SetTimer(SpawnTowerTimerHandle, this, &AToonTanksGameMode::SpawnTurret, TowerSpawnTimer, true);
+	}
+
+	if (PowerupSpawnTimerActivate == true)
+	{
+		// Creates a timer to start spawning the powerups
+		GetWorldTimerManager().SetTimer(SpawnPowerupTimerHandle, this, &AToonTanksGameMode::SpawnPowerup, PowerupSpawnTimer, true);
 	}
 }
 
@@ -93,6 +101,24 @@ FVector AToonTanksGameMode::CalculateSpawnArea(AActor* OriginActor, float MinDis
 	return RandomLocation;
 }
 
+int32 AToonTanksGameMode::GetTargetTowerCount() const
+{
+	TArray<AActor*> TowerArray;
+	
+	UGameplayStatics::GetAllActorsOfClass(this, ATower::StaticClass(), TowerArray);
+
+	return TowerArray.Num();
+}
+
+int32 AToonTanksGameMode::GetPowerupCount() const
+{
+	TArray<AActor*> PowerupArray;
+
+	UGameplayStatics::GetAllActorsOfClass(this, AInvunPowerUp::StaticClass(), PowerupArray);
+
+	return PowerupArray.Num();
+}
+
 void AToonTanksGameMode::SpawnTurret()
 {
 	// Gets the location from the random calculated location
@@ -110,14 +136,19 @@ void AToonTanksGameMode::SpawnTurret()
 			DrawDebugSphere(GetWorld(), Tank->GetActorLocation(), MaxRadius, 20, FColor::Green, false, 2.f);
 		}
 	}
-	UE_LOG(LogTemp, Display, TEXT("Turrets: %i"), CurrentTowers);
 }
 
-int32 AToonTanksGameMode::GetTargetTowerCount() const
+void AToonTanksGameMode::SpawnPowerup()
 {
-	TArray<AActor*> TowerArray;
-	
-	UGameplayStatics::GetAllActorsOfClass(this, ATower::StaticClass(), TowerArray);
+	FVector SpawnLocation = CalculateSpawnArea(Tank, MinRadius, MaxRadius);
 
-	return TowerArray.Num();
+	CurrentPowerups = GetPowerupCount();
+
+	if (InvunClass != nullptr && CurrentPowerups < MoxPowerups && PowerupSpawnTimerActivate == true)
+	{
+		GetWorld()->SpawnActor<AInvunPowerUp>(InvunClass, SpawnLocation, FRotator::ZeroRotator);
+		CurrentPowerups++;
+	}
 }
+
+

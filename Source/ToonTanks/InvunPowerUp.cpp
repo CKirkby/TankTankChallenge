@@ -43,11 +43,10 @@ void AInvunPowerUp::Tick(float DeltaTime)
 
 void AInvunPowerUp::OverlapEvent(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
-	if (OtherActor && OtherActor != this)
+	if (OtherActor == PlayerTank && OtherActor != this)
 	{
 		PlayerHealthComp->SetInvunerable();
 		UGameplayStatics::PlaySoundAtLocation(this, PowerUpSound, GetActorLocation());
-		UE_LOG(LogTemp, Display, TEXT("Pickup Picked Up"));
 		Destroy();
 	}
 }

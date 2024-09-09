@@ -89,7 +89,6 @@ void ATank::EnableShields() const
 	if(ShieldSphere)
 	{
 		ShieldSphere->SetVisibility(true);
-		UE_LOG(LogTemp, Display, TEXT("Deavtivated Shields"));
 	}
 }
 
@@ -98,7 +97,6 @@ void ATank::DisableShields() const
 	if(ShieldSphere)
 	{
 		ShieldSphere->SetVisibility(false);
-		UE_LOG(LogTemp, Display, TEXT("Activated Shields"));
 	}
 }
 

@@ -32,7 +32,8 @@ protected:
 	UPROPERTY(EditAnywhere, Category = "Tower Spawn")
 	TSubclassOf<class ATower> TowerClass;
 	UPROPERTY()
-	class ATower* Tower;
+	ATower* Tower;
+	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Tower Spawn")
 	bool TowerSpawnTimerActivate = true;
 
@@ -65,6 +66,26 @@ protected:
 	void SpawnTurret();
 	FVector CalculateSpawnArea(AActor* Origin, float MinDistance, float MaxDistance);
 #pragma endregion
+
+	UFUNCTION(BlueprintCallable, Category = "Powerup Spawn")
+	void SpawnPowerup();
+	int32 GetPowerupCount() const;
+	
+	UPROPERTY(EditAnywhere, Category = "Powerup Spawn")
+	TSubclassOf<class AInvunPowerUp> InvunClass;
+	UPROPERTY()
+	AInvunPowerUp* Invunerable;
+
+	UPROPERTY(EditAnywhere, category = "Powerup Spawn")
+	bool PowerupSpawnTimerActivate = true;
+
+	int32 CurrentPowerups;
+	UPROPERTY(EditAnywhere, Category = "Powerup Spawn")
+	int32 MoxPowerups = 2;
+
+	UPROPERTY(EditAnywhere, category = "Powerup Spawn")
+	float PowerupSpawnTimer = 25;
+
 	
 private:
 	class ATank* Tank;
@@ -77,5 +98,6 @@ private:
 	
 	int32 GetTargetTowerCount() const;
 
-	FTimerHandle SpawnTimerHandle;
+	FTimerHandle SpawnTowerTimerHandle;
+	FTimerHandle SpawnPowerupTimerHandle;
 };
